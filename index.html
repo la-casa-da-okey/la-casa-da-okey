@@ -200,7 +200,11 @@
         });
       });
 
-      const ordered = Object.values(totals).sort((a,b)=>b.wins-a.wins||b.games-a.games);
+      const ordered = Object.values(totals).sort((a,b)=>{
+  const rateA = a.games ? a.wins/a.games : 0;
+  const rateB = b.games ? b.wins/b.games : 0;
+  return rateB-rateA || b.wins-a.wins || b.games-a.games;
+});
       document.getElementById("ranking").innerHTML = ordered.map((p,i)=>{
         const rate = p.games ? Math.round(p.wins/p.games*100) : 0;
         const medal = i===0 ? "🥇" : i===1 ? "🥈" : i===2 ? "🥉" : (i+1)+".";
@@ -221,7 +225,7 @@
           const p = players.find(x=>x.id===id);
           const games = Number(r.games)||0;
           const stars = Number(r.stars)||0;
-          return `<tr><td>${p?p.name:id}</td><td>${games}</td><td>${stars}</td><td>${games-stars}</td><td>${money(stars*(Number(w.starPrice)||0))}</td></tr>`;
+          return `<tr><td>${p?(p.name||p.id):id}</td><td>${games}</td><td>${stars}</td><td>${games-stars}</td><td>${money(stars*(Number(w.starPrice)||0))}</td></tr>`;
         }).join("");
         const editButton = isAdmin() ? `<button class="edit" onclick="editWeek('${w.id}')">✏️ Bu Haftayı Düzenle</button>` : "";
         return `<details>
